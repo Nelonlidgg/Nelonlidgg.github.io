@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Surprise 💌</title>
+    <style>
+        /* ===== FONTS ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+
+        /* ===== GLOBAL STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #8B0000 0%, #DC143C 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===== FLOATING HEARTS BACKGROUND ===== */
+        .heart-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            animation: float-up 6s infinite ease-in;
+            opacity: 0;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* ===== PAGE CONTAINER ===== */
+        .page {
+            display: none;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        /* ===== CARD STYLES ===== */
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .card h1 {
+            font-family: 'Playfair Display', serif;
+            color: #8B0000;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        /* ===== INPUT STYLES ===== */
+        input[type="password"],
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #DC143C;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #8B0000;
+        }
+
+        /* ===== BUTTON STYLES ===== */
+        .btn {
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 0, 0, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #a8a8a8 0%, #6b6b6b 100%);
+            box-shadow: 0 5px 15px rgba(107, 107, 107, 0.4);
+        }
+
+        /* ===== SHAKE ANIMATION ===== */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        /* ===== ERROR MESSAGE ===== */
+        .error-message {
+            color: #8B0000;
+            font-weight: 600;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* ===== PAGE 3 MAIN VALENTINE STYLES ===== */
+        .main-valentine {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            padding-bottom: 100px;
+        }
+
+        .valentine-card-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 0;
+            margin-bottom: 80vh;
+        }
+
+        .valentine-card-img {
+            max-width: 700px;
+            width: 90%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            animation: float 3s ease-in-out infinite;
+            z-index: 2;
+            position: relative;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* ===== CLICKABLE ITEMS - PEEKING FROM BEHIND ===== */
+        .clickable-item {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+
+        .clickable-item:hover {
+            transform: scale(1.08) !important;
+        }
+
+        /* Left side - Flower peeking from BEHIND */
+        .flower-item {
+            left: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Right side - Ticket peeking from BEHIND */
+        .coupon-item {
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .clickable-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Real image icons - NO WHITE BACKGROUND */
+        .icon-img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        /* Arrow pointing to clickable items */
+        .arrow {
+            font-size: 24px;
+            animation: bounce 1s infinite;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(8px); }
+        }
+
+        /* "click to see" text styling */
+        .hint-text {
+            font-size: 12px;
+            color: white;
+            font-weight: 500;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px 10px;
+            border-radius: 15px;
+            white-space: nowrap;
+        }
+
+        /* ===== FLOWER PAGE - REDUCED SIZE ===== */
+        .love-message {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .love-message h2 {
+            font-family: 'Playfair Display', serif;
+            color: #8B0000;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .love-message p {
+            color: #555;
+            line-height: 1.7;
+            font-size: 1em;
+            margin-bottom: 25px;
+        }
+
+        /* ===== COUPON PAGE ===== */
+        .coupon-reveal {
+            text-align: center;
+        }
+
+        .coupon-img {
+            max-width: 500px;
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            margin: 20px 0;
+            animation: sparkle 1s ease;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.05) rotate(-5deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+            75% { transform: scale(1.05) rotate(-5deg); }
+        }
+
+        /* ===== FINAL SECTION - RED BACKGROUND, SMALL SIZE ===== */
+        .final-section {
+            background: transparent;
+            padding: 20px;
+            border-radius: 0;
+            box-shadow: none;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+
+        .final-section h2 {
+            font-family: 'Playfair Display', serif;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== RESET BUTTON - BOTTOM RIGHT OF ENTIRE PAGE ===== */
+        .global-reset-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(139, 0, 0, 0.8);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+        }
+
+        .global-reset-btn:hover {
+            background: rgba(220, 20, 60, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ===== HEART EXPLOSION ===== */
+        .heart-explosion {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .explosion-heart {
+            position: absolute;
+            font-size: 30px;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .success-message {
+            display: none;
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: white;
+            font-weight: 600;
+            animation: fadeIn 0.5s;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1024px) {
+            .valentine-card-img {
+                max-width: 600px;
+            }
+            
+            .flower-item {
+                left: 3%;
+            }
+            
+            .coupon-item {
+                right: 3%;
+            }
+
+            .icon-img {
+                width: 85px;
+                height: 85px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 30px 20px;
+            }
+
+            .card h1 {
+                font-size: 1.5em;
+            }
+
+            .valentine-card-img {
+                max-width: 500px;
+            }
+
+            .icon-img {
+                width: 70px;
+                height: 70px;
+            }
+
+            .arrow {
+                font-size: 20px;
+            }
+
+            .hint-text {
+                font-size: 10px;
+            }
+            
+            .flower-item {
+                left: 2%;
+            }
+            
+            .coupon-item {
+                right: 2%;
+            }
+
+            .love-message {
+                padding: 25px;
+            }
+
+            .love-message h2 {
+                font-size: 1.3em;
+            }
+
+            .final-section h2 {
+                font-size: 1em;
+            }
+
+            .global-reset-btn {
+                font-size: 11px;
+                padding: 8px 16px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .valentine-card-img {
+                max-width: 100%;
+            }
+
+            .flower-item {
+                left: 1%;
+            }
+
+            .coupon-item {
+                right: 1%;
+            }
+
+            .icon-img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .arrow {
+                font-size: 18px;
+            }
+
+            .hint-text {
+                font-size: 9px;
+            }
+
+            .final-section h2 {
+                font-size: 0.95em;
+            }
+
+            .global-reset-btn {
+                font-size: 10px;
+                padding: 7px 14px;
+            }
+
+            .love-message {
+                padding: 20px;
+            }
+
+            .love-message h2 {
+                font-size: 1.2em;
+            }
+
+            .love-message p {
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Hearts Background -->
+    <div class="heart-container" id="heartContainer"></div>
+
+    <!-- Global Reset Button - Bottom Right of Page -->
+    <button class="global-reset-btn" onclick="resetWebsite()" style="display: none;" id="globalResetBtn">↻ Reset</button>
+
+    <!-- PAGE 1: PASSWORD ACCESS -->
+    <div class="page active" id="page1">
+        <div class="card">
+            <h1>ACCESS REQUIRED 💌</h1>
+            <p>Enter the secret password to continue...</p>
+            <!-- EDIT PLACEHOLDER TEXT BELOW -->
+            <input type="password" id="passwordInput" placeholder="Hint: My middle name... (First letter should be in capital)">
+            <button class="btn" onclick="checkPassword()">Grant Access</button>
+            <p class="error-message" id="errorMessage">Hmm… try again, lover boy 😉</p>
+        </div>
+    </div>
+
+    <!-- PAGE 2: IDENTITY CONFIRMATION -->
+    <div class="page" id="page2">
+        <div class="card">
+            <!-- EDIT NAME BELOW -->
+            <h1>For OBUM… is that you? 💘</h1>
+            <button class="btn" onclick="confirmIdentity(true)">Yes, it's me 😌</button>
+            <button class="btn btn-secondary" onclick="confirmIdentity(false)">No, it's not me 🙄</button>
+            <p class="error-message" id="identityError">Then why are you here? 🤨</p>
+        </div>
+    </div>
+
+    <!-- PAGE 3: MAIN VALENTINE PAGE -->
+    <div class="page" id="page3">
+        <div class="main-valentine">
+            <div class="valentine-card-container">
+                <!-- ===== MAIN VALENTINE CARD IMAGE - FULL PATH ===== -->
+                <img src="file:///C:/Users/pc/Music/VAL/valentine-card.png" alt="Valentine Card" class="valentine-card-img">
+                
+                <!-- Left Flower Peeking from BEHIND -->
+                <div class="clickable-item flower-item" onclick="showFlower()">
+                    <div class="clickable-content">
+                        <!-- ===== FLOWER IMAGE - FULL PATH ===== -->
+                        <img src="file:///C:/Users/pc/Music/VAL/flowers.png" alt="Flowers" class="icon-img">
+                        <div class="arrow">👈</div>
+                        <div class="hint-text">click to see</div>
+                    </div>
+                </div>
+
+                <!-- Right Ticket Peeking from BEHIND -->
+                <div class="clickable-item coupon-item" onclick="showCouponPrompt()">
+                    <div class="clickable-content">
+                        <!-- ===== TICKET IMAGE - FULL PATH ===== -->
+                        <img src="file:///C:/Users/pc/Music/VAL/ticket.png" alt="Ticket" class="icon-img">
+                        <div class="arrow">👉</div>
+                        <div class="hint-text">click to see</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Section - Small, Red Background, Requires Scrolling -->
+            <div class="final-section">
+                <!-- EDIT QUESTION TEXT BELOW -->
+                <h2>Did you like your present? ❤️</h2>
+                <div class="button-container">
+                    <button class="btn" id="yesBtn" onclick="handleResponse(true)">Yes 😍</button>
+                    <button class="btn btn-secondary" id="noBtn" onclick="handleResponse(false)">No 😒</button>
+                </div>
+                <p class="success-message" id="successMessage">Yayyy! I love you so much ❤️</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 4: FLOWER MESSAGE (REDUCED SIZE) -->
+    <div class="page" id="page4">
+        <div class="love-message">
+            <h2>A Message For You 💕</h2>
+            <!-- ===== EDIT YOUR LOVE MESSAGE BELOW ===== -->
+            <p>
+               For all the times you’ve made me feel loved and appreciated, I honestly don’t even have enough words to say thank you properly.
+               I’m really grateful for you. For having you. For us.
+               I know I’m not always the easiest girlfriend. I can be annoying sometimes (small small 😌). But please know that I care about you deeply, and I’m always trying to be better, for us.
+               I love you.
+               Happy Valentine’s Day❤️
+            </p>
+            <button class="btn" onclick="goBack()">Go Back</button>
+        </div>
+    </div>
+
+    <!-- PAGE 5: COUPON PROMPT -->
+    <div class="page" id="page5">
+        <div class="card">
+            <h1>🎟️</h1>
+            <p style="font-size: 1.1em; margin-bottom: 30px;">It looks like a coupon. Would you like to know more?</p>
+            <button class="btn" onclick="showCoupon()">Yes</button>
+            <button class="btn btn-secondary" onclick="goBack()">Go Back</button>
+        </div>
+    </div>
+
+    <!-- PAGE 6: COUPON REVEAL -->
+    <div class="page" id="page6">
+        <div class="coupon-reveal">
+            <!-- ===== COUPON IMAGE - FULL PATH ===== -->
+            <img src="file:///C:/Users/pc/Music/VAL/coupon.png" alt="Valentine Coupon" class="coupon-img">
+            <br>
+            <button class="btn" onclick="goBack()">Go Back</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== EDITABLE PASSWORD =====
+        // Change "0000" to your desired password
+        const correctPassword = "Miriam";
+
+        // ===== FLOATING HEARTS BACKGROUND =====
+        function createFloatingHearts() {
+            const container = document.getElementById('heartContainer');
+            const hearts = ['❤️', '💕', '💖', '💗', '💝', '💘'];
+            
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                heart.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 8000);
+            }, 300);
+        }
+
+        // ===== PAGE 1: PASSWORD CHECK =====
+        function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('errorMessage');
+            const card = document.querySelector('#page1 .card');
+            
+            if (input.value === correctPassword) {
+                showPage('page2');
+            } else {
+                card.classList.add('shake');
+                error.style.display = 'block';
+                setTimeout(() => {
+                    card.classList.remove('shake');
+                }, 500);
+            }
+        }
+
+        // ===== PAGE 2: IDENTITY CONFIRMATION =====
+        function confirmIdentity(isCorrect) {
+            const error = document.getElementById('identityError');
+            
+            if (isCorrect) {
+                showPage('page3');
+                // Show reset button when entering main page
+                document.getElementById('globalResetBtn').style.display = 'block';
+            } else {
+                error.style.display = 'block';
+            }
+        }
+
+        // ===== NAVIGATION =====
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function goBack() {
+            showPage('page3');
+        }
+
+        // ===== RESET WEBSITE =====
+        function resetWebsite() {
+            // Reset all variables
+            noClickCount = 0;
+            hasAnsweredYes = false;
+            
+            // Reset button states
+            const yesBtn = document.getElementById('yesBtn');
+            const noBtn = document.getElementById('noBtn');
+            const successMsg = document.getElementById('successMessage');
+            
+            yesBtn.style.transform = 'scale(1)';
+            noBtn.style.transform = 'scale(1)';
+            noBtn.style.display = 'inline-block';
+            noBtn.textContent = 'No 😒';
+            successMsg.style.display = 'none';
+            
+            // Reset password input
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('identityError').style.display = 'none';
+            
+            // Hide reset button
+            document.getElementById('globalResetBtn').style.display = 'none';
+            
+            // Go back to page 1
+            showPage('page1');
+        }
+
+        // ===== SHOW FLOWER MESSAGE =====
+        function showFlower() {
+            showPage('page4');
+        }
+
+        // ===== SHOW COUPON PROMPT =====
+        function showCouponPrompt() {
+            showPage('page5');
+        }
+
+        // ===== SHOW COUPON =====
+        function showCoupon() {
+            showPage('page6');
+        }
+
+        // ===== FINAL SECTION RESPONSE =====
+        let noClickCount = 0;
+        let hasAnsweredYes = false;
+
+        function handleResponse(isYes) {
+            const yesBtn = document.getElementById('yesBtn');
+            const noBtn = document.getElementById('noBtn');
+            const successMsg = document.getElementById('successMessage');
+            
+            if (isYes) {
+                if (!hasAnsweredYes) {
+                    hasAnsweredYes = true;
+                    createHeartExplosion();
+                    successMsg.style.display = 'block';
+                }
+            } else {
+                noClickCount++;
+                
+                if (noClickCount === 1) {
+                    // First click - show confirmation
+                    noBtn.textContent = 'Are you sure? 🥹';
+                } else {
+                    // Subsequent clicks - grow Yes, shrink No
+                    const yesScale = 1 + (noClickCount * 0.15);
+                    const noScale = Math.max(0.3, 1 - (noClickCount * 0.15));
+                    
+                    yesBtn.style.transform = `scale(${yesScale})`;
+                    noBtn.style.transform = `scale(${noScale})`;
+                    
+                    // Hide No button after several clicks
+                    if (noClickCount >= 5) {
+                        noBtn.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // ===== HEART EXPLOSION =====
+        function createHeartExplosion() {
+            const explosionContainer = document.createElement('div');
+            explosionContainer.className = 'heart-explosion';
+            document.body.appendChild(explosionContainer);
+            
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'explosion-heart';
+                heart.textContent = '❤️';
+                
+                const angle = (Math.PI * 2 * i) / 20;
+                const distance = 200;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                heart.style.setProperty('--tx', tx + 'px');
+                heart.style.setProperty('--ty', ty + 'px');
+                heart.style.animationDelay = (i * 0.05) + 's';
+                
+                explosionContainer.appendChild(heart);
+            }
+            
+            setTimeout(() => {
+                explosionContainer.remove();
+            }, 1500);
+        }
+
+        // ===== ENTER KEY SUPPORT =====
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // ===== INITIALIZE =====
+        window.onload = function() {
+            createFloatingHearts();
+        };
+    </script>
+</body>
+</html>
